@@ -13,6 +13,7 @@ const PORT = process.env.PORT || 8000; // Use a fallback port
 // **Middleware** - Necessary for processing JSON data from POST requests
 app.use(express.json());
 
+<<<<<<< HEAD
 // **Database Connection Function**
 const connectDB = async () => {
     try {
@@ -44,3 +45,28 @@ app.get('/', (req, res) => {
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
+=======
+//run on a port
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
+
+// Connect MongoDB
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => console.log("MongoDB Connected"))
+  .catch((err) => console.log(err));
+
+// Routes-auth
+const authRoutes = require("./routes/authRoutes");
+app.use("/api/auth", authRoutes);
+
+// Routes-student
+const studentRoutes = require("./routes/StudentRoutes");
+app.use("/api", studentRoutes);
+
+
+
+
+>>>>>>> 375ab666fae79573ff4b0c20046f76ea348a21fb
