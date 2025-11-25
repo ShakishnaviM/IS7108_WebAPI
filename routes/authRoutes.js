@@ -7,10 +7,10 @@ const User = require("../models/User");
 // SIGNUP API
 router.post("/signup", async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { username, email, password } = req.body;
 
     // Validate
-    if (!name || !email || !password) {
+    if (!username || !email || !password) {
       return res.status(400).json({ message: "All fields required" });
     }
 
@@ -25,7 +25,7 @@ router.post("/signup", async (req, res) => {
 
     // Create user
     const newUser = await User.create({
-      name,
+      username,
       email,
       password: hashedPassword
     });
@@ -41,7 +41,7 @@ router.post("/signup", async (req, res) => {
       message: "Signup successful",
       user: {
         id: newUser._id,
-        name: newUser.name,
+        username: newUser.username,
         email: newUser.email
       },
       token
