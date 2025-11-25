@@ -19,5 +19,36 @@ router.get("/students", async (req, res) => {
       });
     }
   });
-  
+
+// UPDATE student
+router.put("/students/:id", async (req, res) => {
+  try {
+    const updatedStudent = await Student.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedStudent) {
+      return res.status(404).json({
+        success: false,
+        message: "Student not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Student updated successfully",
+      data: updatedStudent,
+    });
+
+  } catch (error) {
+    console.log("Update Error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error updating student",
+    });
+  }
+});
+
   module.exports = router;
