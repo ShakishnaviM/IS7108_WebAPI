@@ -15,5 +15,7 @@ mongoose
   .then(() => console.log("MongoDB Connected"))
   .catch((err) => console.log(err));
 
+//const authRoutes = require("./routes/authRoutes");
+app.use("/api/auth", authRoutes);
 
 
