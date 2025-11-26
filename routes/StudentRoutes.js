@@ -1,42 +1,47 @@
 const express = require("express");
 const router = express.Router();
- HEAD
-//const User = require("../models/User");
-
 const Student = require('../models/Student'); // Import the Student Model
 
-// @route   POST /api/students
-// @desc    Create a new student record
-// @access  Public (Will be Private later with auth)
-router.post('/', async (req, res) => {
-    // Destructure the required fields from the request body
-    const { studentId, name, email, course } = req.body; 
+// ------------------------------------------------------------------
+// 1. POST /api/students - CREATE (Lakmini's task)
+// ------------------------------------------------------------------
 
-    // **Input Validation**
-    if (!studentId || !name || !email || !course) {
-        return res.status(400).json({ msg: 'Please provide Student ID, Name, Email, and Course.' });
+router.post('/', async (req, res) => {
+    // Destructure ALL new fields from the request body
+    const { fullname, email, age, studentId, course, year, address } = req.body; 
+
+    // **Input Validation** (Checking only required fields: fullname and email)
+    if (!fullname || !email) {
+        return res.status(400).json({ msg: 'Please provide full name and email, as these are required fields.' });
     }
 
     try {
-        // **Check for Duplicates (ID or Email)**
-        let student = await Student.findOne({ $or: [{ studentId }, { email }] });
+        // **Check for Duplicates (Email)**
+        let student = await Student.findOne({ email });
         if (student) {
-            return res.status(400).json({ msg: 'A student with this ID or Email already exists.' });
+            return res.status(400).json({ msg: 'A student with this email already exists.' });
         }
 
         // **Create New Student Instance**
         const newStudent = new Student({
-            studentId,
-            name,
+            fullname,
             email,
-            course
+            age,
+            studentId,
+            course,
+            year,
+            address
         });
 
         // **Save to Database**
         await newStudent.save();
         
         // **Success Response** (201 Created)
-        res.status(201).json(newStudent);
+        res.status(201).json({ 
+            success: true, 
+            message: "Student created successfully", 
+            data: newStudent 
+        });
         
     } catch (err) {
         console.error(err.message);
@@ -45,57 +50,67 @@ router.post('/', async (req, res) => {
     }
 });
 
-module.exports = router;
-const Student = require("../models/Student");
+// ------------------------------------------------------------------
+// 2. GET /api/students - READ ALL (Lakchika's task)
+// ------------------------------------------------------------------
 
-// GET all students
-router.get("/students", async (req, res) => {
+router.get('/', async (req, res) => {
     try {
-      const students = await Student.find().sort({ _id: -1 });
-      return res.status(200).json({
-        success: true,
-        count: students.length,
-        data: students,
-      });
+        // Fetch all students, sorted by creation date (newest first)
+        const students = await Student.find().sort({ createdAt: -1 }); 
+        
+        return res.status(200).json({
+            success: true,
+            count: students.length,
+            data: students,
+        });
     } catch (error) {
-      console.error("Error fetching students:", error);
-      return res.status(500).json({
-        success: false,
-        message: "Server error while fetching students",
-      });
+        console.error("Error fetching students:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Server error while fetching students",
+        });
     }
-  });
-
-// UPDATE student
-router.put("/students/:id", async (req, res) => {
-  try {
-    const updatedStudent = await Student.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true, runValidators: true }
-    );
-
-    if (!updatedStudent) {
-      return res.status(404).json({
-        success: false,
-        message: "Student not found",
-      });
-    }
-
-    res.status(200).json({
-      success: true,
-      message: "Student updated successfully",
-      data: updatedStudent,
-    });
-
-  } catch (error) {
-    console.log("Update Error:", error);
-    res.status(500).json({
-      success: false,
-      message: "Error updating student",
-    });
-  }
 });
 
-  module.exports = router;
-//>>>>>>> 375ab666fae79573ff4b0c20046f76ea348a21fb
+// ------------------------------------------------------------------
+// 3. PUT /api/students/:id - UPDATE (Vishaka's task)
+// ------------------------------------------------------------------
+
+router.put('/:id', async (req, res) => {
+    try {
+        // Find the student by ID from the URL parameters (req.params.id) and update it
+        const updatedStudent = await Student.findByIdAndUpdate(
+            req.params.id,
+            req.body,
+            { new: true, runValidators: true } // {new: true} returns the updated document
+        );
+
+        if (!updatedStudent) {
+            return res.status(404).json({
+                success: false,
+                message: "Student not found",
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "Student updated successfully",
+            data: updatedStudent,
+        });
+
+    } catch (error) {
+        console.log("Update Error:", error);
+        // This catches validation errors (e.g., trying to use a duplicate email)
+        res.status(500).json({ 
+            success: false, 
+            message: "Error updating student" 
+        }); 
+    }
+});
+
+// ------------------------------------------------------------------
+// Export the router
+// ------------------------------------------------------------------
+
+module.exports = router;

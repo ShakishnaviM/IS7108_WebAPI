@@ -1,24 +1,23 @@
-
-
-// server.js
-
-// Load environment variables immediately
-require('dotenv').config();
-const express = require('express');
-const mongoose = require('mongoose');
+// Load environment variables first
+require("dotenv").config();
+const express = require("express");
+const mongoose = require("mongoose");
+const cors = require("cors"); // Include cors middleware
 
 const app = express();
-const PORT = process.env.PORT || 8000; // Use a fallback port
 
-// **Middleware** - Necessary for processing JSON data from POST requests
+// **Middleware**
+// 1. Process incoming JSON data (Crucial for POST/PUT requests)
 app.use(express.json());
+// 2. Enable Cross-Origin Resource Sharing
+app.use(cors());
 
-<<<<<<< HEAD
-// **Database Connection Function**
+
+// **Database Connection**
 const connectDB = async () => {
     try {
         await mongoose.connect(process.env.MONGO_URI);
-        console.log('MongoDB Connected');
+        console.log("MongoDB Connected");
     } catch (err) {
         console.error(err.message);
         // Exit process with failure
@@ -28,45 +27,33 @@ const connectDB = async () => {
 
 connectDB();
 
+
 // -------------------------------------------------------------
-// **1. Define the Student Routes (We will create this file next)**
-const studentRoutes = require('./routes/studentRoutes');
-app.use('/api/students', studentRoutes); // Sets up the base route for all student APIs
+// **ROUTES**
 // -------------------------------------------------------------
 
 
-// **2. Basic Server Test Route (Optional but helpful)**
-app.get('/', (req, res) => {
-    res.send('API is running...');
-});
-
-
-// **3. Start the Server Listener**
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
-=======
-//run on a port
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
-
-// Connect MongoDB
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => console.log("MongoDB Connected"))
-  .catch((err) => console.log(err));
-
-// Routes-auth
 const authRoutes = require("./routes/authRoutes");
 app.use("/api/auth", authRoutes);
 
-// Routes-student
-const studentRoutes = require("./routes/StudentRoutes");
-app.use("/api", studentRoutes);
+// Routes-student (Your and other student CRUD tasks)
+// NOTE: Ensure the file is named 'studentRoutes.js' (lowercase s)
+
+// The variable name is changed to StudentRoutes to potentially resolve the TypeScript/IDE casing conflict.
+const StudentRoutes = require("./routes/studentRoutes"); 
+app.use("/api/students", StudentRoutes); 
 
 
+// **Basic Server Test Route (Optional but helpful)**
+app.get("/", (req, res) => {
+    res.send("API is running and ready for requests...");
+});
 
 
->>>>>>> 375ab666fae79573ff4b0c20046f76ea348a21fb
+// **Start the Server Listener**
+// Use PORT from .env, defaulting to 5000 if not found
+const PORT = process.env.PORT || 5000; 
+
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});
