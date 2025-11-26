@@ -1,28 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const Student = require("../models/Student");
+const Student = require('../models/Student'); // Import the Student Model
 
-// GET all students
-router.get("/students", async (req, res) => {
-    try {
-      const students = await Student.find().sort({ _id: -1 });
-      return res.status(200).json({
-        success: true,
-        count: students.length,
-        data: students,
-      });
-    } catch (error) {
-      console.error("Error fetching students:", error);
-      return res.status(500).json({
-        success: false,
-        message: "Server error while fetching students",
-      });
-    }
-  });
-
-// ------------------------------------------------------------------
-// 1. POST /api/students - CREATE 
-// ------------------------------------------------------------------
 
 router.post('/', async (req, res) => {
     // Destructure ALL new fields from the request body
@@ -122,12 +101,6 @@ router.put('/:id', async (req, res) => {
     }
 });
 
-// ------------------------------------------------------------------
-// Export the router
-// ------------------------------------------------------------------
-
-
-//------------------------------------------------------
   // DELETE student by ID
 
 router.delete("/:id", async (req, res) => {
@@ -156,3 +129,4 @@ router.delete("/:id", async (req, res) => {
 });
 
   module.exports = router;
+
