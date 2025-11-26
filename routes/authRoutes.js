@@ -99,4 +99,36 @@ router.post("/login", async (req, res) => {
   }
 });
 
+
+// In-memory token blacklist
+let tokenBlacklist = [];
+
+// Logout route
+router.post("/logout", (req, res) => {
+  const token = req.headers["authorization"]?.split(" ")[1]; // get token from headers
+  if (!token) return res.status(400).json({ message: "Token is required" });
+
+  tokenBlacklist.push(token); // add token to blacklist
+  res.status(200).json({ message: "Logged out successfully" });
+});
+
+
+//Validation
+
+function verifyToken(req, res, next) {
+  const token = req.headers["authorization"]?.split(" ")[1];
+  if (!token) return res.status(401).json({ message: "No token provided" });
+
+  if (tokenBlacklist.includes(token)) {
+    return res.status(403).json({ message: "Token is invalid (logged out)" });
+  }
+
+  jwt.verify(token, process.env.JWT_SECRET || "encrypt123", (err, decoded) => {
+    if (err) return res.status(401).json({ message: "Invalid token" });
+    req.user = decoded;
+    next();
+  });
+}
+
+
 module.exports = router;
