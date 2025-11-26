@@ -2,9 +2,6 @@ const express = require("express");
 const router = express.Router();
 const Student = require('../models/Student'); // Import the Student Model
 
-// ------------------------------------------------------------------
-// 1. POST /api/students - CREATE (Lakmini's task)
-// ------------------------------------------------------------------
 
 router.post('/', async (req, res) => {
     // Destructure ALL new fields from the request body
@@ -50,9 +47,7 @@ router.post('/', async (req, res) => {
     }
 });
 
-// ------------------------------------------------------------------
-// 2. GET /api/students - READ ALL (Lakchika's task)
-// ------------------------------------------------------------------
+
 
 router.get('/', async (req, res) => {
     try {
@@ -73,9 +68,6 @@ router.get('/', async (req, res) => {
     }
 });
 
-// ------------------------------------------------------------------
-// 3. PUT /api/students/:id - UPDATE (Vishaka's task)
-// ------------------------------------------------------------------
 
 router.put('/:id', async (req, res) => {
     try {
@@ -109,8 +101,32 @@ router.put('/:id', async (req, res) => {
     }
 });
 
-// ------------------------------------------------------------------
-// Export the router
-// ------------------------------------------------------------------
+  // DELETE student by ID
 
-module.exports = router;
+router.delete("/:id", async (req, res) => {
+    try {
+        const deletedStudent = await Student.findByIdAndDelete(req.params.id);
+
+        if (!deletedStudent) {
+            return res.status(404).json({
+                success: false,
+                message: "Student not found",
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Student deleted successfully",
+            data: deletedStudent,
+        });
+    } catch (error) {
+        console.error("Error deleting student:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Server error while deleting student",
+        });
+    }
+});
+
+  module.exports = router;
+
