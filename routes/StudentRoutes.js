@@ -68,6 +68,31 @@ router.get('/', async (req, res) => {
     }
 });
 
+// GET by ID
+
+router.get("/:id", async (req, res) => {
+    try {
+        const student = await Student.findById(req.params.id);
+
+        if (!student) {
+            return res.status(404).json({
+                success: false,
+                message: "Student not found",
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            data: student,
+        });
+    } catch (error) {
+        console.error("Error fetching student by ID:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Server error while fetching student",
+        });
+    }
+});
 
 router.put('/:id', async (req, res) => {
     try {
